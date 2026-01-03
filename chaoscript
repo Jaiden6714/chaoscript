@@ -1,169 +1,127 @@
--- FUN CHAOS MENU (Compact Wide Version with Invisible, TP Forward & FE Fly)
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local UIS = game:GetService("UserInputService")
-local lplr = Players.LocalPlayer
-local mouse = lplr:GetMouse()
+-- OWNER AUTO-BYPASS + KEYSYSTEM + CHAOS AUTO LOADER
 
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local HttpService = game:GetService("HttpService")
+
+-- CONFIG
+local OWNER_USERID = 840305075
+local CHAOS_URL = "https://raw.githubusercontent.com/Jaiden6714/chaoscript/refs/heads/main/chaoscript"
+
+-- KEYS (DO NOT CHANGE)
+local DEV_KEY = "XJ9FQ2LZM8VBYKP"
+local WEEKLY_KEY = "MZ8KQ1LVY3TR"
+
+-------------------------------------------------
+-- OWNER BYPASS
+-------------------------------------------------
+if LocalPlayer.UserId == OWNER_USERID then
+	loadstring(game:HttpGet(CHAOS_URL))()
+	return
+end
+
+-------------------------------------------------
 -- GUI
-local gui = Instance.new("ScreenGui", lplr:WaitForChild("PlayerGui"))
+-------------------------------------------------
+local gui = Instance.new("ScreenGui")
+gui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 gui.ResetOnSpawn = false
 
 local main = Instance.new("Frame", gui)
-main.Size = UDim2.new(0,400,0,300) -- slightly taller for new buttons
-main.Position = UDim2.new(0.5,-200,0.5,-150)
-main.BackgroundColor3 = Color3.fromRGB(135,206,235) -- sky blue
+main.Size = UDim2.new(0, 420, 0, 320)
+main.Position = UDim2.new(0.5, -210, 0.5, -160)
+main.BackgroundColor3 = Color3.fromRGB(135, 206, 235)
 main.Active = true
 main.Draggable = true
-Instance.new("UICorner", main).CornerRadius = UDim.new(0,12)
+Instance.new("UICorner", main).CornerRadius = UDim.new(0, 14)
 
 local title = Instance.new("TextLabel", main)
-title.Size = UDim2.new(1,0,0,40)
+title.Size = UDim2.new(1, 0, 0, 45)
 title.BackgroundTransparency = 1
-title.Text = "FUN CHAOS MENU"
+title.Text = "CHAOS KEY SYSTEM"
 title.Font = Enum.Font.GothamBold
-title.TextSize = 20
+title.TextSize = 22
 title.TextColor3 = Color3.new(1,1,1)
 
--- Helper to make toggle buttons
-local function MakeToggle(text, y, default, callback)
-    local label = Instance.new("TextLabel", main)
-    label.Size = UDim2.new(0.6,-10,0,25)
-    label.Position = UDim2.new(0,10,0,y)
-    label.BackgroundTransparency = 1
-    label.TextXAlignment = Enum.TextXAlignment.Left
-    label.TextColor3 = Color3.new(1,1,1)
-    label.Font = Enum.Font.Gotham
-    label.TextSize = 14
-    label.Text = text
+-------------------------------------------------
+-- KEY INPUT
+-------------------------------------------------
+local keyBox = Instance.new("TextBox", main)
+keyBox.Size = UDim2.new(0.7, 0, 0, 40)
+keyBox.Position = UDim2.new(0, 15, 0, 70)
+keyBox.BackgroundColor3 = Color3.fromRGB(35,35,35)
+keyBox.TextColor3 = Color3.new(1,1,1)
+keyBox.PlaceholderText = "Enter key here"
+keyBox.Text = ""
+keyBox.Font = Enum.Font.Gotham
+keyBox.TextSize = 15
+keyBox.ClearTextOnFocus = false
+Instance.new("UICorner", keyBox).CornerRadius = UDim.new(0, 8)
 
-    local toggle = Instance.new("TextButton", main)
-    toggle.Size = UDim2.new(0.3,0,0,25)
-    toggle.Position = UDim2.new(0.65,10,0,y)
-    toggle.BackgroundColor3 = default and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,0,0)
-    toggle.Text = default and "ON" or "OFF"
-    toggle.TextColor3 = Color3.new(1,1,1)
-    toggle.Font = Enum.Font.GothamBold
-    toggle.TextSize = 14
-    Instance.new("UICorner", toggle).CornerRadius = UDim.new(0,5)
+-------------------------------------------------
+-- GET KEY BUTTON
+-------------------------------------------------
+local getKey = Instance.new("TextButton", main)
+getKey.Size = UDim2.new(0.25, 0, 0, 40)
+getKey.Position = UDim2.new(0.75, -5, 0, 70)
+getKey.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+getKey.Text = "Get Key"
+getKey.TextColor3 = Color3.new(1,1,1)
+getKey.Font = Enum.Font.GothamBold
+getKey.TextSize = 15
+Instance.new("UICorner", getKey).CornerRadius = UDim.new(0, 8)
 
-    local state = default
-    toggle.MouseButton1Click:Connect(function()
-        state = not state
-        toggle.BackgroundColor3 = state and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,0,0)
-        toggle.Text = state and "ON" or "OFF"
-        callback(state)
-    end)
+getKey.MouseButton1Click:Connect(function()
+	setclipboard("https://discord.gg/82Ju5HzDHN")
+	getKey.Text = "Discord Copied"
+end)
+
+-------------------------------------------------
+-- STATUS
+-------------------------------------------------
+local status = Instance.new("TextLabel", main)
+status.Size = UDim2.new(1, -20, 0, 110)
+status.Position = UDim2.new(0, 10, 0, 130)
+status.BackgroundTransparency = 1
+status.TextWrapped = true
+status.TextColor3 = Color3.fromRGB(0,255,0)
+status.Font = Enum.Font.Gotham
+status.TextSize = 15
+status.Text = "Status: Waiting for key..."
+
+-------------------------------------------------
+-- VALIDATION
+-------------------------------------------------
+local function validKey(input)
+	return input == DEV_KEY or input == WEEKLY_KEY
 end
 
--- Noclip
-local noclipActive = false
-MakeToggle("Noclip",50,false,function(val) noclipActive=val end)
-RunService.Stepped:Connect(function()
-    if noclipActive and lplr.Character then
-        for _,part in pairs(lplr.Character:GetChildren()) do
-            if part:IsA("BasePart") then part.CanCollide = false end
-        end
-    end
+local function accept()
+	status.Text = "✅ Key accepted! Loading Chaos Menu..."
+	task.wait(0.6)
+	gui:Destroy()
+	loadstring(game:HttpGet(CHAOS_URL))()
+end
+
+keyBox.FocusLost:Connect(function(enter)
+	if enter then
+		if validKey(keyBox.Text) then
+			accept()
+		else
+			status.Text = "❌ Invalid key"
+		end
+	end
 end)
 
--- FE Fly
-local flyActive = false
-local flySpeed = 50
-local bodyPos, bodyGyro
-
-MakeToggle("Fly",85,false,function(val)
-    flyActive = val
-    local char = lplr.Character
-    if char and char:FindFirstChild("HumanoidRootPart") then
-        local hrp = char.HumanoidRootPart
-        if flyActive then
-            bodyPos = Instance.new("BodyPosition")
-            bodyPos.MaxForce = Vector3.new(1e5,1e5,1e5)
-            bodyPos.Position = hrp.Position
-            bodyPos.Parent = hrp
-
-            bodyGyro = Instance.new("BodyGyro")
-            bodyGyro.MaxTorque = Vector3.new(1e5,1e5,1e5)
-            bodyGyro.CFrame = hrp.CFrame
-            bodyGyro.Parent = hrp
-        else
-            if bodyPos then bodyPos:Destroy() bodyPos=nil end
-            if bodyGyro then bodyGyro:Destroy() bodyGyro=nil end
-        end
-    end
-end)
-
-RunService.RenderStepped:Connect(function()
-    if flyActive and bodyPos and bodyGyro and lplr.Character and lplr.Character:FindFirstChild("HumanoidRootPart") then
-        local hrp = lplr.Character.HumanoidRootPart
-        local cam = workspace.CurrentCamera
-        local direction = Vector3.new()
-
-        if UIS:IsKeyDown(Enum.KeyCode.W) then direction += cam.CFrame.LookVector end
-        if UIS:IsKeyDown(Enum.KeyCode.S) then direction -= cam.CFrame.LookVector end
-        if UIS:IsKeyDown(Enum.KeyCode.A) then direction -= cam.CFrame.RightVector end
-        if UIS:IsKeyDown(Enum.KeyCode.D) then direction += cam.CFrame.RightVector end
-        if UIS:IsKeyDown(Enum.KeyCode.Space) then direction += Vector3.new(0,1,0) end
-        if UIS:IsKeyDown(Enum.KeyCode.LeftControl) then direction -= Vector3.new(0,1,0) end
-
-        if direction.Magnitude > 0 then
-            bodyPos.Position = hrp.Position + direction.Unit * flySpeed * RunService.RenderStepped:Wait()
-            bodyGyro.CFrame = CFrame.new(hrp.Position, hrp.Position + direction)
-        end
-    end
-end)
-
--- Teleport to mouse
-MakeToggle("TP to Mouse",120,false,function(val)
-    if val and lplr.Character and lplr.Character:FindFirstChild("HumanoidRootPart") then
-        local mousePos = mouse.Hit.Position + Vector3.new(0,5,0)
-        lplr.Character.HumanoidRootPart.CFrame = CFrame.new(mousePos)
-    end
-end)
-
--- Spawn point
-local spawnPos
-MakeToggle("Set Spawn Point",155,false,function(val)
-    if val and lplr.Character and lplr.Character:FindFirstChild("HumanoidRootPart") then
-        spawnPos = lplr.Character.HumanoidRootPart.Position
-    end
-end)
-
-MakeToggle("Respawn at Spawn",190,false,function(val)
-    if val and spawnPos then
-        lplr.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(spawnPos)
-    end
-end)
-
--- Invisible
-local invisibleActive = false
-MakeToggle("Invisible",225,false,function(val)
-    invisibleActive = val
-    if lplr.Character then
-        for _,part in pairs(lplr.Character:GetChildren()) do
-            if part:IsA("BasePart") then
-                part.Transparency = invisibleActive and 1 or 0
-            elseif part:IsA("Decal") or part:IsA("Texture") then
-                part.Transparency = invisibleActive and 1 or 0
-            end
-        end
-    end
-end)
-
--- Teleport Forward (5 studs)
-MakeToggle("Teleport Forward",260,false,function(val)
-    if val and lplr.Character and lplr.Character:FindFirstChild("HumanoidRootPart") then
-        local hrp = lplr.Character.HumanoidRootPart
-        hrp.CFrame = hrp.CFrame + hrp.CFrame.LookVector * 5
-    end
-end)
-
--- Desync (might work)
-local desyncActive = false
-MakeToggle("Desync (might work)",295,false,function(val)
-    desyncActive = val
-    if lplr.Character and lplr.Character:FindFirstChild("HumanoidRootPart") then
-        lplr.Character.HumanoidRootPart.Anchored = desyncActive
-    end
-end)
+-------------------------------------------------
+-- FOOTER
+-------------------------------------------------
+local footer = Instance.new("TextLabel", main)
+footer.Size = UDim2.new(1, -10, 0, 18)
+footer.Position = UDim2.new(0, 0, 1, -20)
+footer.BackgroundTransparency = 1
+footer.Text = "made by idk019845 & chatGPT"
+footer.Font = Enum.Font.Gotham
+footer.TextSize = 10
+footer.TextColor3 = Color3.new(1,1,1)
+footer.TextXAlignment = Enum.TextXAlignment.Right
