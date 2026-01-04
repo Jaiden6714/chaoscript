@@ -1,18 +1,20 @@
--- FUN CHAOS MENU (Compact Wide Version with Invisible, TP Forward & FE Fly)
+-- FUN CHAOS ULTIMATE MEGA MENU v2 (iOS Delta Fully Functional)
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
 local lplr = Players.LocalPlayer
 local mouse = lplr:GetMouse()
 
+-- =============================
 -- GUI
+-- =============================
 local gui = Instance.new("ScreenGui", lplr:WaitForChild("PlayerGui"))
 gui.ResetOnSpawn = false
 
 local main = Instance.new("Frame", gui)
-main.Size = UDim2.new(0,400,0,300) -- slightly taller for new buttons
-main.Position = UDim2.new(0.5,-200,0.5,-150)
-main.BackgroundColor3 = Color3.fromRGB(135,206,235) -- sky blue
+main.Size = UDim2.new(0,550,0,500)
+main.Position = UDim2.new(0.5,-275,0.5,-250)
+main.BackgroundColor3 = Color3.fromRGB(30,30,30)
 main.Active = true
 main.Draggable = true
 Instance.new("UICorner", main).CornerRadius = UDim.new(0,12)
@@ -20,26 +22,59 @@ Instance.new("UICorner", main).CornerRadius = UDim.new(0,12)
 local title = Instance.new("TextLabel", main)
 title.Size = UDim2.new(1,0,0,40)
 title.BackgroundTransparency = 1
-title.Text = "FUN CHAOS MENU"
+title.Text = "FUN CHAOS ULTIMATE MENU"
 title.Font = Enum.Font.GothamBold
 title.TextSize = 20
 title.TextColor3 = Color3.new(1,1,1)
 
--- Helper to make toggle buttons
-local function MakeToggle(text, y, default, callback)
-    local label = Instance.new("TextLabel", main)
-    label.Size = UDim2.new(0.6,-10,0,25)
-    label.Position = UDim2.new(0,10,0,y)
+-- Scroll frame
+local scroll = Instance.new("ScrollingFrame", main)
+scroll.Size = UDim2.new(1,-20,1,-50)
+scroll.Position = UDim2.new(0,10,0,45)
+scroll.CanvasSize = UDim2.new(0,0,5,0)
+scroll.ScrollBarThickness = 8
+scroll.BackgroundTransparency = 1
+
+local layout = Instance.new("UIListLayout", scroll)
+layout.SortOrder = Enum.SortOrder.LayoutOrder
+layout.Padding = UDim.new(0,10)
+
+-- =============================
+-- Helper functions
+-- =============================
+local function MakeCategory(name)
+    local label = Instance.new("TextLabel", scroll)
+    label.Size = UDim2.new(1,0,0,25)
+    label.BackgroundTransparency = 0.5
+    label.BackgroundColor3 = Color3.fromRGB(50,50,50)
+    label.TextColor3 = Color3.new(1,1,1)
+    label.Font = Enum.Font.GothamBold
+    label.TextSize = 16
+    label.Text = name
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    local padding = Instance.new("UIPadding", label)
+    padding.PaddingLeft = UDim.new(0,5)
+end
+
+local function MakeToggle(parent,text,default,callback)
+    local frame = Instance.new("Frame", parent)
+    frame.Size = UDim2.new(1,0,0,25)
+    frame.BackgroundTransparency = 1
+
+    local label = Instance.new("TextLabel", frame)
+    label.Size = UDim2.new(0.7,0,1,0)
     label.BackgroundTransparency = 1
     label.TextXAlignment = Enum.TextXAlignment.Left
     label.TextColor3 = Color3.new(1,1,1)
     label.Font = Enum.Font.Gotham
     label.TextSize = 14
     label.Text = text
+    local padding = Instance.new("UIPadding", label)
+    padding.PaddingLeft = UDim.new(0,5)
 
-    local toggle = Instance.new("TextButton", main)
-    toggle.Size = UDim2.new(0.3,0,0,25)
-    toggle.Position = UDim2.new(0.65,10,0,y)
+    local toggle = Instance.new("TextButton", frame)
+    toggle.Size = UDim2.new(0.3,0,1,0)
+    toggle.Position = UDim2.new(0.7,0,0,0)
     toggle.BackgroundColor3 = default and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,0,0)
     toggle.Text = default and "ON" or "OFF"
     toggle.TextColor3 = Color3.new(1,1,1)
@@ -56,37 +91,38 @@ local function MakeToggle(text, y, default, callback)
     end)
 end
 
--- Noclip
-local noclipActive = false
-MakeToggle("Noclip",50,false,function(val) noclipActive=val end)
+-- =============================
+-- OP / Movement
+-- =============================
+MakeCategory("OP / Movement")
+
+local noclipActive=false
+MakeToggle(scroll,"Noclip",false,function(val) noclipActive=val end)
 RunService.Stepped:Connect(function()
     if noclipActive and lplr.Character then
-        for _,part in pairs(lplr.Character:GetChildren()) do
-            if part:IsA("BasePart") then part.CanCollide = false end
+        for _,p in pairs(lplr.Character:GetChildren()) do
+            if p:IsA("BasePart") then p.CanCollide=false end
         end
     end
 end)
 
--- FE Fly
-local flyActive = false
-local flySpeed = 50
-local bodyPos, bodyGyro
-
-MakeToggle("Fly",85,false,function(val)
-    flyActive = val
-    local char = lplr.Character
+local flyActive=false
+local flySpeed=50
+local bodyPos,bodyGyro
+MakeToggle(scroll,"FE Fly",false,function(val)
+    flyActive=val
+    local char=lplr.Character
     if char and char:FindFirstChild("HumanoidRootPart") then
-        local hrp = char.HumanoidRootPart
+        local hrp=char.HumanoidRootPart
         if flyActive then
-            bodyPos = Instance.new("BodyPosition")
-            bodyPos.MaxForce = Vector3.new(1e5,1e5,1e5)
-            bodyPos.Position = hrp.Position
-            bodyPos.Parent = hrp
-
-            bodyGyro = Instance.new("BodyGyro")
-            bodyGyro.MaxTorque = Vector3.new(1e5,1e5,1e5)
-            bodyGyro.CFrame = hrp.CFrame
-            bodyGyro.Parent = hrp
+            bodyPos=Instance.new("BodyPosition")
+            bodyPos.MaxForce=Vector3.new(1e5,1e5,1e5)
+            bodyPos.Position=hrp.Position
+            bodyPos.Parent=hrp
+            bodyGyro=Instance.new("BodyGyro")
+            bodyGyro.MaxTorque=Vector3.new(1e5,1e5,1e5)
+            bodyGyro.CFrame=hrp.CFrame
+            bodyGyro.Parent=hrp
         else
             if bodyPos then bodyPos:Destroy() bodyPos=nil end
             if bodyGyro then bodyGyro:Destroy() bodyGyro=nil end
@@ -96,74 +132,216 @@ end)
 
 RunService.RenderStepped:Connect(function()
     if flyActive and bodyPos and bodyGyro and lplr.Character and lplr.Character:FindFirstChild("HumanoidRootPart") then
-        local hrp = lplr.Character.HumanoidRootPart
-        local cam = workspace.CurrentCamera
-        local direction = Vector3.new()
-
-        if UIS:IsKeyDown(Enum.KeyCode.W) then direction += cam.CFrame.LookVector end
-        if UIS:IsKeyDown(Enum.KeyCode.S) then direction -= cam.CFrame.LookVector end
-        if UIS:IsKeyDown(Enum.KeyCode.A) then direction -= cam.CFrame.RightVector end
-        if UIS:IsKeyDown(Enum.KeyCode.D) then direction += cam.CFrame.RightVector end
-        if UIS:IsKeyDown(Enum.KeyCode.Space) then direction += Vector3.new(0,1,0) end
-        if UIS:IsKeyDown(Enum.KeyCode.LeftControl) then direction -= Vector3.new(0,1,0) end
-
-        if direction.Magnitude > 0 then
-            bodyPos.Position = hrp.Position + direction.Unit * flySpeed * RunService.RenderStepped:Wait()
-            bodyGyro.CFrame = CFrame.new(hrp.Position, hrp.Position + direction)
+        local hrp=lplr.Character.HumanoidRootPart
+        local cam=workspace.CurrentCamera
+        local dir=Vector3.new()
+        if UIS:IsKeyDown(Enum.KeyCode.W) then dir+=cam.CFrame.LookVector end
+        if UIS:IsKeyDown(Enum.KeyCode.S) then dir-=cam.CFrame.LookVector end
+        if UIS:IsKeyDown(Enum.KeyCode.A) then dir-=cam.CFrame.RightVector end
+        if UIS:IsKeyDown(Enum.KeyCode.D) then dir+=cam.CFrame.RightVector end
+        if UIS:IsKeyDown(Enum.KeyCode.Space) then dir+=Vector3.new(0,1,0) end
+        if UIS:IsKeyDown(Enum.KeyCode.LeftControl) then dir-=Vector3.new(0,1,0) end
+        if dir.Magnitude>0 then
+            bodyPos.Position=hrp.Position+dir.Unit*flySpeed*RunService.RenderStepped:Wait()
+            bodyGyro.CFrame=CFrame.new(hrp.Position,hrp.Position+dir)
         end
     end
 end)
 
--- Teleport to mouse
-MakeToggle("TP to Mouse",120,false,function(val)
-    if val and lplr.Character and lplr.Character:FindFirstChild("HumanoidRootPart") then
-        local mousePos = mouse.Hit.Position + Vector3.new(0,5,0)
-        lplr.Character.HumanoidRootPart.CFrame = CFrame.new(mousePos)
-    end
-end)
-
--- Spawn point
-local spawnPos
-MakeToggle("Set Spawn Point",155,false,function(val)
-    if val and lplr.Character and lplr.Character:FindFirstChild("HumanoidRootPart") then
-        spawnPos = lplr.Character.HumanoidRootPart.Position
-    end
-end)
-
-MakeToggle("Respawn at Spawn",190,false,function(val)
-    if val and spawnPos then
-        lplr.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(spawnPos)
-    end
-end)
-
--- Invisible
-local invisibleActive = false
-MakeToggle("Invisible",225,false,function(val)
-    invisibleActive = val
-    if lplr.Character then
-        for _,part in pairs(lplr.Character:GetChildren()) do
-            if part:IsA("BasePart") then
-                part.Transparency = invisibleActive and 1 or 0
-            elseif part:IsA("Decal") or part:IsA("Texture") then
-                part.Transparency = invisibleActive and 1 or 0
+local superJumpActive=false
+MakeToggle(scroll,"Super Jump",false,function(val) superJumpActive=val end)
+local infJumpActive=false
+MakeToggle(scroll,"Infinite Jump",false,function(val) infJumpActive=val end)
+UIS.InputBegan:Connect(function(input,processed)
+    if infJumpActive and not processed then
+        if input.UserInputType==Enum.UserInputType.Keyboard or input.UserInputType==Enum.UserInputType.Touch then
+            if lplr.Character and lplr.Character:FindFirstChild("Humanoid") then
+                local hum=lplr.Character.Humanoid
+                hum:ChangeState(Enum.HumanoidStateType.Jumping)
+                hum.RootPart.Velocity=Vector3.new(hum.RootPart.Velocity.X,50,hum.RootPart.Velocity.Z)
             end
         end
     end
 end)
 
--- Teleport Forward (5 studs)
-MakeToggle("Teleport Forward",260,false,function(val)
-    if val and lplr.Character and lplr.Character:FindFirstChild("HumanoidRootPart") then
-        local hrp = lplr.Character.HumanoidRootPart
-        hrp.CFrame = hrp.CFrame + hrp.CFrame.LookVector * 5
+local speedActive=false
+local speedAmount=200
+MakeToggle(scroll,"Speed Boost",false,function(val) speedActive=val end)
+RunService.RenderStepped:Connect(function()
+    if speedActive and lplr.Character and lplr.Character:FindFirstChild("Humanoid") then
+        lplr.Character.Humanoid.WalkSpeed=speedAmount
     end
 end)
 
--- Desync (might work)
-local desyncActive = false
-MakeToggle("Desync (might work)",295,false,function(val)
-    desyncActive = val
-    if lplr.Character and lplr.Character:FindFirstChild("HumanoidRootPart") then
-        lplr.Character.HumanoidRootPart.Anchored = desyncActive
+MakeToggle(scroll,"Teleport Forward",false,function(val)
+    if val and lplr.Character and lplr.Character:FindFirstChild("HumanoidRootPart") then
+        lplr.Character.HumanoidRootPart.CFrame=lplr.Character.HumanoidRootPart.CFrame+lplr.Character.HumanoidRootPart.CFrame.LookVector*5
+    end
+end)
+
+MakeToggle(scroll,"Teleport to Mouse",false,function(val)
+    if val and lplr.Character and lplr.Character:FindFirstChild("HumanoidRootPart") then
+        lplr.Character.HumanoidRootPart.CFrame=CFrame.new(mouse.Hit.Position+Vector3.new(0,5,0))
+    end
+end)
+
+-- =============================
+-- Hiccup / Desync + Highlight
+-- =============================
+MakeCategory("Chaos / Desync")
+
+local hiccupActive=false
+MakeToggle(scroll,"Hiccup Desync",false,function(val) hiccupActive=val end)
+
+local highlightPart=Instance.new("Part")
+highlightPart.Size=Vector3.new(4,4,4)
+highlightPart.Anchored=true
+highlightPart.CanCollide=false
+highlightPart.Transparency=0.3
+highlightPart.Color=Color3.fromRGB(0,255,0)
+highlightPart.Material=Enum.Material.Neon
+highlightPart.Parent=workspace
+
+local highlightActive=true
+MakeToggle(scroll,"Show Real Position",true,function(val)
+    highlightActive=val
+    highlightPart.Visible=highlightActive
+end)
+
+spawn(function()
+    while true do
+        RunService.RenderStepped:Wait()
+        if lplr.Character and lplr.Character:FindFirstChild("HumanoidRootPart") then
+            local hrp=lplr.Character.HumanoidRootPart
+            highlightPart.Position=hrp.Position
+            highlightPart.Visible=highlightActive
+            if hiccupActive then
+                hrp.Anchored=true
+                wait(0.15)
+                hrp.Anchored=false
+                hrp.CFrame=hrp.CFrame
+                wait(0.15)
+            end
+        end
+    end
+end)
+
+-- =============================
+-- Visual / Fun Features
+-- =============================
+MakeCategory("Visual / Fun")
+
+-- Invisible
+local invisibleActive=false
+MakeToggle(scroll,"Invisible",false,function(val)
+    invisibleActive=val
+    if lplr.Character then
+        for _,part in pairs(lplr.Character:GetChildren()) do
+            if part:IsA("BasePart") then
+                part.Transparency=invisibleActive and 1 or 0
+            elseif part:IsA("Decal") or part:IsA("Texture") then
+                part.Transparency=invisibleActive and 1 or 0
+            end
+        end
+    end
+end)
+
+-- Rainbow effect
+local rainbowActive=false
+MakeToggle(scroll,"Rainbow Body",false,function(val) rainbowActive=val end)
+spawn(function()
+    local hue=0
+    while true do
+        RunService.RenderStepped:Wait()
+        if rainbowActive and lplr.Character then
+            hue=(hue+0.005)%1
+            for _,p in pairs(lplr.Character:GetChildren()) do
+                if p:IsA("BasePart") then
+                    p.Color=Color3.fromHSV(hue,1,1)
+                end
+            end
+        end
+    end
+end)
+
+-- Big Head / Giant
+local giantActive=false
+MakeToggle(scroll,"Big Head / Giant",false,function(val) giantActive=val
+    if lplr.Character then
+        for _,p in pairs(lplr.Character:GetChildren()) do
+            if p:IsA("MeshPart") or p:IsA("BasePart") then
+                p.Size=giantActive and p.Size*2 or p.Size/2
+            end
+        end
+    end
+end)
+
+-- Trails / Particles
+local trailActive=false
+MakeToggle(scroll,"Trail Effect",false,function(val) trailActive=val end)
+spawn(function()
+    while true do
+        RunService.RenderStepped:Wait()
+        if trailActive and lplr.Character and lplr.Character:FindFirstChild("HumanoidRootPart") then
+            local hrp=lplr.Character.HumanoidRootPart
+            local trail=Instance.new("Trail")
+            trail.Attachment0=Instance.new("Attachment",hrp)
+            trail.Attachment1=Instance.new("Attachment",hrp)
+            trail.Lifetime=0.5
+            trail.Color=ColorSequence.new(Color3.fromRGB(255,0,0),Color3.fromRGB(0,0,255))
+            trail.Parent=hrp
+            wait(0.1)
+            trail:Destroy()
+        end
+    end
+end)
+
+-- =============================
+-- Utility
+-- =============================
+MakeCategory("Utility")
+
+-- Anti-AFK
+local antiAFKActive=false
+MakeToggle(scroll,"Anti-AFK",false,function(val) antiAFKActive=val end)
+spawn(function()
+    while true do
+        wait(30)
+        if antiAFKActive then
+            local vu = game:GetService("VirtualUser")
+            vu:CaptureController()
+            vu:ClickButton1(Vector2.new())
+        end
+    end
+end)
+
+-- Set Spawn / Respawn
+local spawnPos=nil
+MakeToggle(scroll,"Set Spawn Point",false,function(val)
+    if val and lplr.Character and lplr.Character:FindFirstChild("HumanoidRootPart") then
+        spawnPos=lplr.Character.HumanoidRootPart.Position
+    end
+end)
+MakeToggle(scroll,"Respawn at Spawn",false,function(val)
+    if val and spawnPos then
+        lplr.Character:WaitForChild("HumanoidRootPart").CFrame=CFrame.new(spawnPos)
+    end
+end)
+
+-- =============================
+-- Chaos / Extra
+-- =============================
+MakeCategory("Chaos / Extra")
+
+-- Fake Lag / Rubberband
+local rubberActive=false
+MakeToggle(scroll,"Fake Lag",false,function(val) rubberActive=val end)
+spawn(function()
+    while true do
+        RunService.RenderStepped:Wait()
+        if rubberActive and lplr.Character and lplr.Character:FindFirstChild("HumanoidRootPart") then
+            local hrp=lplr.Character.HumanoidRootPart
+            hrp.CFrame=hrp.CFrame*CFrame.new(0,math.random(-2,2)/2,0)
+        end
     end
 end)
